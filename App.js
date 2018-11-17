@@ -1,45 +1,38 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Header, Button } from 'react-native-elements';
+import { View } from 'react-native';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider, connect } from 'react-redux';
+import ReduxThunk from 'redux-thunk';
+import combineReducers from './reducers';
+import firebase from 'firebase';
+import Routines from './components/Routines';
 
-export default class App extends React.Component {
+class App extends React.Component {
+  //state = { user: null }
+
+  componentWillMount() {
+    firebase.initializeApp({
+      apiKey: "AIzaSyB8g7r9Q9Rtym07OJyhViwKetDzkeBSzWQ",
+      authDomain: "routines-6009a.firebaseapp.com",
+      databaseURL: "https://routines-6009a.firebaseio.com",
+      projectId: "routines-6009a",
+      storageBucket: "routines-6009a.appspot.com",
+      messagingSenderId: "676908909899",
+    });
+
+    firebase.auth().onAuthStateChanged(user => {
+      //this.setState({user});
+    });
+  }
+
   render() {
+    const store = createStore(combineReducers, {}, applyMiddleware(ReduxThunk));
     return (
-      <View style={styles.container}>
-        <Header 
-          centerComponent={{
-            title: 'Kevin\'s Routines',
-            style: styles.headerTitle,
-          }}
-        />
-        <View style={styles.routine}>
-          <Text>Last B time: 10am, Friday, November 9, 2018</Text>
-          <Text>Next B time: 10am, Monday, November 12, 2018</Text>
-          <Button
-            title="Log B Time"
-          />
-        </View>
-        <View style={styles.routine}>
-          <Text>Last S time: 12pm, Friday, November 9, 2018</Text>
-          <Text>Next S time: 12am, Saturday, November 10, 2018</Text>
-          <Button
-            title="Log S Time"
-          />
-        </View>
-      </View>
+      <Provider store={store}>
+        <Routines />
+      </Provider>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  headerTitle: {
-    color: '#fff',
-  },
-});
+export default App;
